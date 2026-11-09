@@ -11,6 +11,18 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        gold: {
+          DEFAULT: "#c9a227",
+          bright: "#e8c766",
+        },
+        parchment: "#e9dfc8",
+        ink: "#0b0a08",
+        panel: "#171410",
+        blood: "#b3261e",
+      },
+      fontFamily: {
+        display: ["var(--font-cinzel)", "Georgia", "serif"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
     },
   },

@@ -1,101 +1,188 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { newLobby, type GameState } from "@/lib/avalon";
+import { newRoomCode, roomLink, store } from "@/lib/store";
+import { GameBoard } from "@/components/GameBoard";
+import { Lobby } from "@/components/Lobby";
+import { RoleReveal } from "@/components/RoleReveal";
+import { Divider, GhostButton, GoldButton, Panel, SectionTitle } from "@/components/ui";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [game, setGame] = useState<GameState | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [joinError, setJoinError] = useState("");
+  const [copied, setCopied] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // On mount: resume ?room=CODE, or offer the last room.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get("room")?.toUpperCase();
+    if (room) {
+      const saved = store.load(room);
+      if (saved) {
+        setGame(saved);
+      } else {
+        setGame(newLobby(room));
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  const update = (next: GameState) => {
+    store.save(next);
+    setGame(next);
+  };
+
+  const createGame = () => {
+    const code = newRoomCode();
+    const fresh = newLobby(code);
+    store.save(fresh);
+    window.history.replaceState(null, "", roomLink(code));
+    setGame(fresh);
+  };
+
+  const joinGame = () => {
+    const code = joinCode.trim().toUpperCase();
+    if (!code) return;
+    const saved = store.load(code);
+    if (saved) {
+      window.history.replaceState(null, "", roomLink(code));
+      setGame(saved);
+      return;
+    }
+    setJoinError(
+      `No saved game for room ${code} on this device. Create a new table, or open the invite link on the host's device.`,
+    );
+  };
+
+  const resumeLast = () => {
+    const last = store.lastRoom();
+    if (!last) return;
+    const saved = store.load(last);
+    if (saved) {
+      window.history.replaceState(null, "", roomLink(last));
+      setGame(saved);
+    }
+  };
+
+  const leaveToStart = () => {
+    window.history.replaceState(null, "", window.location.pathname);
+    setGame(null);
+  };
+
+  const newTable = () => {
+    if (game) store.clear(game.roomCode);
+    leaveToStart();
+  };
+
+  if (!loaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="font-display text-sm tracking-[0.3em] text-[#c9a227] uppercase">
+          Lighting the torches…
+        </p>
+      </div>
+    );
+  }
+
+  if (!game) {
+    const last = store.lastRoom();
+    const lastGame = last ? store.load(last) : null;
+    return (
+      <div className="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center gap-6 px-4 py-16 text-center">
+        <header>
+          <p className="font-display text-xs font-bold tracking-[0.4em] text-[#c9a227] uppercase">
+            The Resistance
+          </p>
+          <h1 className="font-display mt-2 text-7xl font-black tracking-[0.08em] text-[#f5efe0] sm:text-8xl">
+            AVALON
+          </h1>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#a99e83]">
+            A game of hidden loyalty and quiet betrayal, played on one shared
+            device. Five quests stand between Camelot and the dark.
+          </p>
+        </header>
+
+        <Divider className="w-full" />
+
+        <div className="flex w-full flex-col gap-3">
+          <GoldButton onClick={createGame} className="w-full py-4 text-base">
+            Create a new table
+          </GoldButton>
+
+          {lastGame && (
+            <GhostButton onClick={resumeLast} className="w-full py-3">
+              Resume room {lastGame.roomCode} — {lastGame.players.length} knight
+              {lastGame.players.length === 1 ? "" : "s"}
+              {lastGame.phase !== "lobby" ? ` · ${lastGame.phase}` : " · in lobby"}
+            </GhostButton>
+          )}
+
+          <Panel className="p-4">
+            <SectionTitle className="mb-2 text-sm">Join a room</SectionTitle>
+            <div className="flex gap-2">
+              <input
+                value={joinCode}
+                onChange={(e) => {
+                  setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""));
+                  setJoinError("");
+                }}
+                onKeyDown={(e) => e.key === "Enter" && joinGame()}
+                placeholder="Room code — e.g. KQMT"
+                maxLength={4}
+                className="min-w-0 flex-1 rounded-full border border-[#3a332a] bg-[#0b0a08] px-4 py-3 text-center font-display text-lg font-bold tracking-[0.3em] text-[#f5efe0] placeholder:text-[#6f6650] focus:border-[#c9a227] focus:outline-none"
+              />
+              <GoldButton onClick={joinGame} disabled={joinCode.length !== 4}>
+                Join
+              </GoldButton>
+            </div>
+            {joinError && <p className="mt-2 text-xs leading-relaxed text-[#ff8a80]">{joinError}</p>}
+          </Panel>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        <div className="grid w-full grid-cols-3 gap-2 text-center">
+          {[
+            { n: "5–10", label: "players" },
+            { n: "5", label: "quests" },
+            { n: "3", label: "to win" },
+          ].map((s) => (
+            <Panel key={s.label} className="px-2 py-3">
+              <p className="font-display text-2xl font-black text-[#e8c766]">{s.n}</p>
+              <p className="text-[11px] tracking-[0.18em] text-[#a99e83] uppercase">{s.label}</p>
+            </Panel>
+          ))}
+        </div>
+
+        <p className="max-w-md text-xs leading-relaxed text-[#6f6650]">
+          Pass-and-play on one device — the phone moves around the table, and
+          secrets stay secret behind hold-to-reveal. A realtime multiplayer
+          backend can plug into the same game state later.
+        </p>
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            } catch {
+              /* clipboard unavailable */
+            }
+          }}
+          className="text-xs font-semibold text-[#c9a227] hover:text-[#e8c766]"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+          {copied ? "✓ Link copied" : "Copy a link to this page"}
+        </button>
+      </div>
+    );
+  }
+
+  if (game.phase === "lobby") {
+    return <Lobby game={game} onUpdate={update} onLeave={leaveToStart} />;
+  }
+  if (game.phase === "reveal") {
+    return <RoleReveal game={game} onUpdate={update} />;
+  }
+  return <GameBoard game={game} onUpdate={update} onNewTable={newTable} />;
 }
