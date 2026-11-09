@@ -55,6 +55,20 @@ export function Lobby({
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 pt-10 pb-16 sm:pt-16">
       {/* Title */}
       <header className="text-center">
+        {/* Round-table crest — pure CSS/SVG art: the five quest stones ring
+            the realm's star, no stock imagery. */}
+        <div className="mx-auto mb-5 flex h-28 w-28 items-center justify-center" aria-hidden>
+          <svg viewBox="0 0 120 120" className="h-28 w-28 drop-shadow-[0_0_18px_rgba(201,162,39,0.35)]">
+            <circle cx="60" cy="60" r="56" fill="none" stroke="#c9a227" strokeWidth="1.5" opacity="0.7" />
+            <circle cx="60" cy="60" r="47" fill="none" stroke="#c9a227" strokeWidth="0.75" opacity="0.4" />
+            <circle cx="60" cy="13" r="5" fill="#c9a227" />
+            <circle cx="106" cy="47" r="5" fill="#c9a227" opacity="0.8" />
+            <circle cx="88" cy="101" r="5" fill="#c9a227" opacity="0.6" />
+            <circle cx="32" cy="101" r="5" fill="#c9a227" opacity="0.6" />
+            <circle cx="14" cy="47" r="5" fill="#c9a227" opacity="0.8" />
+            <text x="60" y="76" textAnchor="middle" fontSize="34" fill="#e8c766" fontFamily="Cinzel, Georgia, serif">✦</text>
+          </svg>
+        </div>
         <p className="font-display text-xs font-bold tracking-[0.4em] text-[#c9a227] uppercase">
           The Resistance
         </p>
@@ -66,28 +80,35 @@ export function Lobby({
           between Camelot and the dark — and not everyone at this table is who
           they claim to be.
         </p>
+        <p className="mx-auto mt-3 inline-block rounded-full border border-[#c9a227]/50 bg-[#c9a227]/10 px-4 py-1.5 text-xs font-bold tracking-[0.14em] text-[#e8c766] uppercase">
+          Pass-and-play · one shared device
+        </p>
       </header>
 
       <Divider />
 
-      {/* Room code */}
+      {/* Room code — v1 is pass-and-play on ONE shared device. The link
+          only resumes this room on the device that created it; opening it
+          elsewhere starts a new empty table. Say so up front. */}
       <Panel className="p-5">
         <div className="flex flex-col items-center gap-3 text-center">
           <SectionTitle>Your table</SectionTitle>
-          <p className="text-sm text-[#a99e83]">
-            Room code — share it so friends can open this room on their own
-            device.
+          <p className="max-w-md text-sm leading-relaxed text-[#a99e83]">
+            One device, passed around the table. This room lives on{" "}
+            <strong className="text-[#e9dfc8]">this device only</strong> — the
+            code below resumes it here if you leave and come back.
           </p>
           <p className="font-display text-4xl font-black tracking-[0.35em] text-[#e8c766]">
             {game.roomCode}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <GhostButton onClick={copyLink}>{copied ? "✓ Link copied" : "Copy invite link"}</GhostButton>
+            <GhostButton onClick={copyLink}>{copied ? "✓ Link copied" : "Copy room link"}</GhostButton>
             <GhostButton onClick={onLeave}>Leave room</GhostButton>
           </div>
           <p className="max-w-md text-xs leading-relaxed text-[#6f6650]">
-            v1 is pass-and-play: one shared device, passed around the table.
-            The link resumes this room on the device that created it.
+            The link does not share the game with other devices: a friend who
+            opens it starts a new empty table. Online multiplayer is coming in
+            a later version.
           </p>
         </div>
       </Panel>
@@ -138,36 +159,53 @@ export function Lobby({
         )}
       </Panel>
 
-      {/* Options */}
+      {/* Options — Percival and Morgana are independent choices. */}
       <Panel className="p-5">
         <SectionTitle className="mb-3">Optional roles</SectionTitle>
-        <label
-          className={`flex items-start gap-3 rounded-xl border p-3 ${
-            specialAvailable ? "cursor-pointer border-[#2c2618]" : "cursor-not-allowed border-[#2c2618] opacity-50"
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={game.options.percival && game.options.morgana}
-            disabled={!specialAvailable}
-            onChange={(e) =>
-              onUpdate(
-                setOptions(game, { percival: e.target.checked, morgana: e.target.checked }),
-              )
-            }
-            className="mt-1 h-4 w-4 accent-[#c9a227]"
-          />
-          <span>
-            <span className="block text-sm font-semibold text-[#e9dfc8]">
-              Percival &amp; Morgana
+        <div className="flex flex-col gap-2.5">
+          <label
+            className={`flex items-start gap-3 rounded-xl border p-3 ${
+              specialAvailable ? "cursor-pointer border-[#2c2618]" : "cursor-not-allowed border-[#2c2618] opacity-50"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={game.options.percival}
+              disabled={!specialAvailable}
+              onChange={(e) => onUpdate(setOptions(game, { percival: e.target.checked }))}
+              className="mt-1 h-4 w-4 accent-[#c9a227]"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-[#e9dfc8]">Percival ⚔</span>
+              <span className="block text-xs leading-relaxed text-[#a99e83]">
+                Percival sees two faces — one is Merlin, the other is Morgana
+                wearing his shape. He must guess whom to trust. Requires 7+
+                players.
+              </span>
             </span>
-            <span className="block text-xs leading-relaxed text-[#a99e83]">
-              Percival knows Merlin — but Morgana wears the same face, so he
-              sees two possible Merlins. Adds delicious doubt. Requires 7+
-              players.
+          </label>
+          <label
+            className={`flex items-start gap-3 rounded-xl border p-3 ${
+              specialAvailable ? "cursor-pointer border-[#2c2618]" : "cursor-not-allowed border-[#2c2618] opacity-50"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={game.options.morgana}
+              disabled={!specialAvailable}
+              onChange={(e) => onUpdate(setOptions(game, { morgana: e.target.checked }))}
+              className="mt-1 h-4 w-4 accent-[#c9a227]"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-[#e9dfc8]">Morgana ☾</span>
+              <span className="block text-xs leading-relaxed text-[#a99e83]">
+                Morgana appears as Merlin to Percival&rsquo;s sight. Without
+                Percival she plays as a minion — her deception only matters if
+                Percival is in play. Requires 7+ players.
+              </span>
             </span>
-          </span>
-        </label>
+          </label>
+        </div>
         {!specialAvailable && (
           <p className="mt-2 text-xs text-[#6f6650]">
             Add at least 7 knights to unlock Percival &amp; Morgana.
