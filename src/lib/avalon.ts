@@ -204,34 +204,41 @@ export function generateRoomCode(): string {
   return code;
 }
 
-/** The role list for a table of `count` players. Percival replaces a servant,
- *  Morgana replaces a minion; both are only offered at 7+ players. */
+/** The role list for a table of `count` players. Percival replaces a
+ *  servant and Morgana replaces a minion; each is only offered at 7+
+ *  players, and each is independent — Percival without Morgana (and
+ *  vice versa) is a standard variant. */
 export function rolesForPlayerCount(
   count: number,
   options: GameOptions,
 ): RoleId[] {
-  const useSpecial = count >= 7 && options.percival && options.morgana;
+  const usePercival = count >= 7 && options.percival;
+  const useMorgana = count >= 7 && options.morgana;
+  const withSpecials = (base: RoleId[]): RoleId[] => {
+    const roles = [...base];
+    if (usePercival) {
+      const i = roles.indexOf("servant");
+      if (i >= 0) roles[i] = "percival";
+    }
+    if (useMorgana) {
+      const i = roles.indexOf("minion");
+      if (i >= 0) roles[i] = "morgana";
+    }
+    return roles;
+  };
   switch (count) {
     case 5:
       return ["merlin", "assassin", "servant", "servant", "minion"];
     case 6:
       return ["merlin", "assassin", "servant", "servant", "servant", "minion"];
     case 7:
-      return useSpecial
-        ? ["merlin", "percival", "assassin", "morgana", "servant", "servant", "minion"]
-        : ["merlin", "assassin", "servant", "servant", "servant", "minion", "minion"];
+      return withSpecials(["merlin", "assassin", "servant", "servant", "servant", "minion", "minion"]);
     case 8:
-      return useSpecial
-        ? ["merlin", "percival", "assassin", "morgana", "servant", "servant", "servant", "minion"]
-        : ["merlin", "assassin", "servant", "servant", "servant", "servant", "minion", "minion"];
+      return withSpecials(["merlin", "assassin", "servant", "servant", "servant", "servant", "minion", "minion"]);
     case 9:
-      return useSpecial
-        ? ["merlin", "percival", "assassin", "morgana", "servant", "servant", "servant", "servant", "minion"]
-        : ["merlin", "assassin", "servant", "servant", "servant", "servant", "servant", "minion", "minion"];
+      return withSpecials(["merlin", "assassin", "servant", "servant", "servant", "servant", "servant", "minion", "minion"]);
     case 10:
-      return useSpecial
-        ? ["merlin", "percival", "assassin", "morgana", "servant", "servant", "servant", "servant", "minion", "minion"]
-        : ["merlin", "assassin", "servant", "servant", "servant", "servant", "servant", "minion", "minion", "minion"];
+      return withSpecials(["merlin", "assassin", "servant", "servant", "servant", "servant", "servant", "minion", "minion", "minion"]);
     default:
       throw new Error(`Avalon needs 5–10 players, got ${count}`);
   }
@@ -278,9 +285,12 @@ export function whatPlayerSees(
       .map((p) => ({ player: p, label: "Evil", alignment: "evil" as Alignment }));
   }
   if (viewer.role === "percival") {
-    return shuffle(
-      others.filter((p) => p.role === "merlin" || p.role === "morgana"),
-    ).map((p) => ({ player: p, label: "Merlin?", alignment: "good" as Alignment }));
+    // Stable order: sort by player id so the two "Merlin?" entries never
+    // flip places between renders (a shuffle here re-rolled every render).
+    return others
+      .filter((p) => p.role === "merlin" || p.role === "morgana")
+      .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+      .map((p) => ({ player: p, label: "Merlin?", alignment: "good" as Alignment }));
   }
   if (isEvilRole(viewer.role)) {
     return others
@@ -417,7 +427,10 @@ export function castProposalVote(
 export function continueAfterVoteResult(state: GameState): GameState {
   if (state.phase !== "vote-result" || !state.lastProposal) return state;
   if (state.lastProposal.approved) {
-    return { ...state, phase: "quest", questVotes: {}, lastProposal: null };
+    // A team was approved: the rejection streak is broken. The vote track
+    // counts CONSECUTIVE rejections only — five in a row, per the rules —
+    // so an approval resets it.
+    return { ...state, voteTrack: 0, phase: "quest", questVotes: {}, lastProposal: null };
   }
   const voteTrack = state.voteTrack + 1;
   if (voteTrack >= MAX_REJECTIONS) {
@@ -487,6 +500,10 @@ export function continueAfterQuestResult(state: GameState): GameState {
   const next: GameState = {
     ...state,
     questResults,
+    // The quest resolved, so the rejection streak is broken too: the vote
+    // track counts consecutive rejections within a quest round, and a
+    // resolved quest starts the next round at zero.
+    voteTrack: 0,
     lastQuest: null,
     proposedTeam: [],
     votes: {},
