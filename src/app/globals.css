@@ -3,19 +3,70 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0a08;
+  --foreground: #e9dfc8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: #0b0a08;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(201, 162, 39, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(179, 38, 30, 0.07), transparent 60%),
+    #0b0a08;
+  background-attachment: fixed;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.35);
+  color: #f5efe0;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0a08;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c2618;
+  border-radius: 8px;
+  border: 2px solid #0b0a08;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9a227;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 199, 102, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(232, 199, 102, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
 }
