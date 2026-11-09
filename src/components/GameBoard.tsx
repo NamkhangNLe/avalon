@@ -268,6 +268,14 @@ function QuestPhase({
   const voter = voterId ? game.players.find((p) => p.id === voterId) : undefined;
   const votedCount = Object.keys(game.questVotes).length;
   const needsTwo = failsNeeded(game.players.length, game.round) === 2;
+  // A fail card is the highest-stakes tap in the game and cannot be undone,
+  // so it takes two taps: arm, then confirm. Switching to success disarms.
+  const [confirmFail, setConfirmFail] = useState(false);
+  // A fresh voter starts disarmed — the previous knight's armed confirm
+  // must never carry over to the next secret turn.
+  useEffect(() => {
+    setConfirmFail(false);
+  }, [voterId]);
 
   if (!voter) return null;
   const isGood = !isEvilRole(voter.role);
@@ -309,16 +317,32 @@ function QuestPhase({
             <p className="text-center text-sm leading-relaxed text-[#a99e83]">
               Choose your card in secret.
             </p>
-            <GoldButton onClick={() => onUpdate(castQuestVote(game, voter.id, true))}>
+            <GoldButton
+              onClick={() => {
+                setConfirmFail(false);
+                onUpdate(castQuestVote(game, voter.id, true));
+              }}
+            >
               ✓ Play success
             </GoldButton>
             <GhostButton
               tone="danger"
               className="py-3"
-              onClick={() => onUpdate(castQuestVote(game, voter.id, false))}
+              onClick={() => {
+                if (confirmFail) {
+                  onUpdate(castQuestVote(game, voter.id, false));
+                } else {
+                  setConfirmFail(true);
+                }
+              }}
             >
-              ✕ Play fail
+              {confirmFail ? "Tap again to confirm — play fail" : "✕ Play fail"}
             </GhostButton>
+            {confirmFail && (
+              <p className="text-center text-xs leading-relaxed text-[#ff8a80]">
+                A fail card cannot be undone. Tap again only if you mean it.
+              </p>
+            )}
           </div>
         )}
       </SecretTurn>
