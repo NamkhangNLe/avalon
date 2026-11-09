@@ -54,6 +54,20 @@ function evilPlayers(g: GameState): Player[] {
   );
 }
 
+/** Drive one rejected proposal: propose a team, everyone rejects, continue. */
+function rejectOnce(g: GameState): GameState {
+  const size = requiredTeamSize(g.players.length, g.round);
+  const team = g.players.slice(0, size).map((p) => p.id);
+  g = proposeTeam(g, team);
+  assert(g.phase === "vote", "phase vote before rejection");
+  for (const p of g.players) g = castProposalVote(g, p.id, false);
+  assert(g.phase === "vote-result", "phase vote-result after rejection");
+  g = continueAfterVoteResult(g);
+  return g;
+}
+
+// ── helpers ────────────────────────────────────────────────────────────────
+
 /** Drive one full quest: propose `team`, everyone approves, quest votes per `failIds`. */
 function runQuest(g: GameState, team: string[], failIds: string[]): GameState {
   const size = requiredTeamSize(g.players.length, g.round);
@@ -89,6 +103,24 @@ for (const n of [5, 6, 7, 8, 9, 10]) {
   }
 }
 
+// ── 1b. Percival and Morgana are independent options (7+ players) ─────────
+for (const n of [7, 8, 9, 10]) {
+  const expectedEvil = n <= 9 ? 3 : 4;
+  const percivalOnly = rolesForPlayerCount(n, { percival: true, morgana: false });
+  assert(percivalOnly.includes("percival") && !percivalOnly.includes("morgana"), `${n}p Percival without Morgana`);
+  const morganaOnly = rolesForPlayerCount(n, { percival: false, morgana: true });
+  assert(morganaOnly.includes("morgana") && !morganaOnly.includes("percival"), `${n}p Morgana without Percival`);
+  for (const roles of [percivalOnly, morganaOnly]) {
+    const evil = roles.filter((r) => ["assassin", "morgana", "minion"].includes(r)).length;
+    assert(evil === expectedEvil, `${n}p single-special: evil=${evil} (expected ${expectedEvil})`);
+    assert(roles.length === n, `${n}p single-special: ${roles.length} roles`);
+  }
+}
+{
+  const small = rolesForPlayerCount(6, { percival: true, morgana: true });
+  assert(!small.includes("percival") && !small.includes("morgana"), "6p: no specials even when requested");
+}
+
 // ── 2. Quest sizes + two-fail rule ───────────────────────────────────────────
 assert(JSON.stringify([5, 6, 7, 8, 9, 10].map((n) => requiredTeamSize(n, 0))) === "[2,2,2,3,3,3]", "quest 1 sizes");
 assert(requiredTeamSize(5, 4) === 3 && requiredTeamSize(10, 4) === 5, "quest 5 sizes");
@@ -110,6 +142,20 @@ assert(failsNeeded(7, 0) === 1, "7p quest 1 needs 1 fail");
   assert(pSeen.length === 2 && pSeen.every((s) => s.label === "Merlin?"), "Percival sees 2 'Merlin?'");
   assert(whatPlayerSees(g, servant.id).length === 0, "Servant sees no one");
   assert(whatPlayerSees(g, minion.id).length === 2, "Minion sees 2 fellow evil");
+}
+
+// ── 3b. Percival's two "Merlin?" entries keep a stable order ───────────────
+{
+  const g = revealAll(makeGame(7, true));
+  const percival = g.players.find((p) => p.role === "percival")!;
+  const first = whatPlayerSees(g, percival.id).map((s) => s.player.id);
+  const second = whatPlayerSees(g, percival.id).map((s) => s.player.id);
+  const third = whatPlayerSees(g, percival.id).map((s) => s.player.id);
+  assert(
+    JSON.stringify(first) === JSON.stringify(second) &&
+      JSON.stringify(second) === JSON.stringify(third),
+    "Percival's Merlin? order is stable across renders",
+  );
 }
 
 // ── 4. Full game: Good wins 3 quests, Assassin guesses wrong ───────────────
@@ -170,6 +216,42 @@ assert(failsNeeded(7, 0) === 1, "7p quest 1 needs 1 fail");
   }
   assert(g.phase === "over" && g.winner === "evil", "5 rejections -> Evil wins");
   assert(g.voteTrack === 5, "voteTrack is 5");
+}
+
+// ── 7b. Rejections split across quests do NOT end the game ──────────────────
+// Regression test for the vote-track bug: the track counts CONSECUTIVE
+// rejections. 2 + 2 + 1 rejections across three quests is five cumulative
+// rejections but never five in a row, so the game must continue.
+{
+  let g = revealAll(makeGame(5, false));
+  // Quest 1: two rejections, then approval + a successful quest.
+  g = rejectOnce(g);
+  assert(g.voteTrack === 1, "1 rejection in quest 1: voteTrack 1");
+  g = rejectOnce(g);
+  assert(g.voteTrack === 2, "2 rejections in quest 1: voteTrack 2");
+  assert(g.phase === "propose" && g.winner === null, "2 rejections: game continues");
+  g = runQuest(g, goodPlayers(g).slice(0, requiredTeamSize(5, g.round)).map((p) => p.id), []);
+  assert(g.voteTrack === 0, "voteTrack resets after quest 1 resolves");
+  // Quest 2: two more rejections, then approval + a successful quest.
+  g = rejectOnce(g);
+  g = rejectOnce(g);
+  assert(g.voteTrack === 2, "2 rejections in quest 2: voteTrack 2");
+  g = runQuest(g, goodPlayers(g).slice(0, requiredTeamSize(5, g.round)).map((p) => p.id), []);
+  assert(g.voteTrack === 0, "voteTrack resets after quest 2 resolves");
+  // Quest 3: one rejection. Cumulative rejections are now 2 + 2 + 1 = 5 —
+  // the old bug ended the game here. Consecutive rejections are only 1.
+  g = rejectOnce(g);
+  assert(g.voteTrack === 1, "1 rejection in quest 3: voteTrack 1");
+  assert(g.phase === "propose" && g.winner === null, "5 cumulative (split) rejections: game continues");
+  // Four more consecutive rejections in quest 3 make five IN A ROW.
+  for (let r = 0; r < 3; r++) {
+    g = rejectOnce(g);
+    assert(g.phase === "propose", `consecutive rejection ${r + 2} of 5: game continues`);
+  }
+  assert(g.voteTrack === 4, "4 consecutive rejections: voteTrack 4");
+  g = rejectOnce(g);
+  assert(g.phase === "over" && g.winner === "evil", "5 consecutive rejections -> Evil wins");
+  assert(g.voteTrack === 5, "voteTrack is 5 after 5 in a row");
 }
 
 // ── 8. Good cannot fail a quest (forced success) ────────────────────────────
