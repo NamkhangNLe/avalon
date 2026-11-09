@@ -247,29 +247,44 @@ export function HoldToReveal({
           holding ? "border-[#c9a227]" : "border-[#2c2618]"
         }`}
       >
-        {/* hidden state — a sealed card back */}
-        <div
-          className={`flex flex-col items-center gap-3 px-6 py-12 text-center transition-opacity duration-200 ${
-            holding ? "pointer-events-none absolute inset-0 opacity-0" : "opacity-100"
-          }`}
-        >
-          <span className="font-display text-5xl text-[#c9a227]">✦</span>
-          <p className="font-display text-sm font-bold tracking-[0.24em] text-[#a99e83] uppercase">
-            Sealed by the realm
-          </p>
-        </div>
-        {/* revealed content */}
-        <div className={holding ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"}>
-          {children}
-        </div>
+        {/* The secret is only ever in the DOM while it is being held.
+            Nothing is opacity-hidden: when released the content unmounts,
+            so it cannot be read from the DOM, a screen reader, or DevTools. */}
+        {holding ? (
+          <div>{children}</div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
+            <span className="font-display text-5xl text-[#c9a227]">✦</span>
+            <p className="font-display text-sm font-bold tracking-[0.24em] text-[#a99e83] uppercase">
+              Sealed by the realm
+            </p>
+          </div>
+        )}
       </div>
       <button
         onPointerDown={start}
         onPointerUp={stop}
         onPointerLeave={stop}
         onPointerCancel={stop}
+        onKeyDown={(e) => {
+          // Keyboard users hold Enter or Space the same way pointer users
+          // hold the button. Ignore auto-repeat so the timer starts once.
+          if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
+            e.preventDefault();
+            start();
+          }
+        }}
+        onKeyUp={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            stop();
+          }
+        }}
+        onBlur={stop}
         onContextMenu={(e) => e.preventDefault()}
-        className="mt-4 w-full touch-none rounded-full border border-[#c9a227]/60 bg-[#c9a227]/10 py-3.5 text-sm font-bold tracking-[0.16em] text-[#e8c766] uppercase transition-colors active:bg-[#c9a227]/25"
+        aria-pressed={holding}
+        aria-label={holding ? "Release to hide your role" : label}
+        className="mt-4 w-full touch-none rounded-full border border-[#c9a227]/60 bg-[#c9a227]/10 py-3.5 text-sm font-bold tracking-[0.16em] text-[#e8c766] uppercase transition-colors outline-none hover:bg-[#c9a227]/20 focus-visible:ring-2 focus-visible:ring-[#e8c766] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b0a08] active:bg-[#c9a227]/25"
       >
         {holding ? "Keep holding…" : label}
       </button>
