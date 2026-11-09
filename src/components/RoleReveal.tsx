@@ -9,7 +9,6 @@ import {
   type GameState,
 } from "@/lib/avalon";
 import { Avatar, Divider, GhostButton, GoldButton, HoldToReveal, Panel } from "./ui";
-import { roleLabel } from "./PlayerGrid";
 
 export function RoleReveal({
   game,
@@ -134,7 +133,6 @@ export function RoleReveal({
           Back to lobby
         </GhostButton>
       </div>
-      <p className="sr-only">{roleLabel(current.role)}</p>
     </div>
   );
 }
