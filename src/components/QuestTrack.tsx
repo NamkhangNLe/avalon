@@ -36,10 +36,11 @@ export function QuestTrack({ state }: { state: GameState }) {
         })}
       </div>
 
-      {/* vote track */}
+      {/* vote track — consecutive rejections only; an approved team or a
+          resolved quest resets the streak, so these pips are "in a row". */}
       <div className="mt-4 flex items-center justify-center gap-2">
         <span className="text-[10px] font-semibold tracking-[0.18em] text-[#6f6650] uppercase">
-          Rejected proposals
+          Rejections in a row
         </span>
         {Array.from({ length: 5 }).map((_, i) => (
           <span
@@ -51,10 +52,10 @@ export function QuestTrack({ state }: { state: GameState }) {
         ))}
         <span className="text-[10px] text-[#6f6650]">
           {state.voteTrack === 4
-            ? "— one more rejection and Evil wins"
+            ? "— one more rejection in a row and Evil wins"
             : state.voteTrack > 0
-              ? `— ${5 - state.voteTrack} left`
-              : "— 5 rejections and Evil wins"}
+              ? `— ${5 - state.voteTrack} more in a row to go`
+              : "— 5 rejections in a row and Evil wins"}
         </span>
       </div>
     </div>
