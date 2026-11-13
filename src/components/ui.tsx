@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, ty
 
 // ── Buttons ──────────────────────────────────────────────────────────────────
 
+// Historical export name retained for call sites; this theme renders red wax.
 export function GoldButton({
   children,
   onClick,
@@ -313,4 +314,4 @@ export function HoldToReveal({
       </div>
     </div>
   );
-}
+  }
