@@ -3,43 +3,43 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0a08;
-  --foreground: #e9dfc8;
+  --background: #090d18;
+  --foreground: #e6ebf9;
 }
 
 html {
-  background: #0b0a08;
+  background: #090d18;
 }
 
 body {
   color: var(--foreground);
   background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(201, 162, 39, 0.12), transparent 60%),
-    radial-gradient(900px 500px at 50% 110%, rgba(179, 38, 30, 0.07), transparent 60%),
-    #0b0a08;
+    radial-gradient(1000px 600px at 50% -10%, rgba(120, 150, 230, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(200, 66, 58, 0.07), transparent 60%),
+    #090d18;
   background-attachment: fixed;
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
 }
 
 ::selection {
-  background: rgba(201, 162, 39, 0.35);
-  color: #f5efe0;
+  background: rgba(159, 180, 230, 0.35);
+  color: #f6f8ff;
 }
 
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0a08;
+  background: #090d18;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2c2618;
+  background: #242f4d;
   border-radius: 8px;
-  border: 2px solid #0b0a08;
+  border: 2px solid #090d18;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c9a227;
+  background: #9fb4e6;
 }
 
 @keyframes fade-up {
@@ -60,13 +60,35 @@ body {
 @keyframes pulse-ring {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(232, 199, 102, 0.35);
+    box-shadow: 0 0 0 0 rgba(219, 228, 255, 0.35);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(232, 199, 102, 0);
+    box-shadow: 0 0 0 6px rgba(219, 228, 255, 0);
   }
 }
 
 .animate-pulse-ring {
   animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Round Table: faint ring of seats behind everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 38%, transparent 0 230px, rgba(159, 180, 230, 0.07) 231px 232px, transparent 233px),
+    radial-gradient(circle at 50% 38%, transparent 0 300px, rgba(159, 180, 230, 0.045) 301px 302px, transparent 303px),
+    radial-gradient(circle at 50% 38%, transparent 0 380px, rgba(159, 180, 230, 0.03) 381px 382px, transparent 383px);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-pulse-ring,
+  .animate-pulse {
+    animation: none;
+  }
 }
