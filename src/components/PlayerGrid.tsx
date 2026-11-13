@@ -60,7 +60,7 @@ export function PlayerCard({
 
   const cls = `flex flex-col items-center gap-1.5 rounded-2xl border p-3 transition-all ${
     isSelected
-      ? "border-[#dbe4ff] bg-[#9fb4e6]/10 shadow-[0_0_20px_rgba(201,162,39,0.25)]"
+      ? "border-[#dbe4ff] bg-[#9fb4e6]/10 shadow-[0_0_20px_rgba(159,180,230,0.25)]"
       : "border-[#242f4d] bg-[#111829]/80"
   } ${onClick ? "cursor-pointer hover:border-[#9fb4e6]/60 active:scale-[0.98]" : ""} ${
     disabled ? "opacity-50" : ""
@@ -127,4 +127,4 @@ export function PlayerGrid({
       ))}
     </div>
   );
-          }
+}
