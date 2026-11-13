@@ -145,7 +145,7 @@ export default function Home() {
                   setJoinError("");
                 }}
                 onKeyDown={(e) => e.key === "Enter" && joinGame()}
-                placeholder="Room code"
+                placeholder="Room code - e.g. KQMT"
                 maxLength={4}
                 className="min-w-0 flex-1 rounded-md border border-[#34416a] bg-[#090d18] px-4 py-3 text-center font-display text-lg font-bold tracking-[0.3em] text-[#f6f8ff] placeholder:text-[#5f6c91] focus:border-[#9fb4e6] focus:outline-none"
               />
@@ -171,9 +171,9 @@ export default function Home() {
         </div>
 
         <p className="max-w-md text-xs leading-relaxed text-[#5f6c91]">
-          Pass-and-play on one device — the phone moves around the table, and
-          secrets stay secret behind hold-to-reveal. A realtime multiplayer
-          backend can plug into the same game state later.
+          Pass-and-play on one device. Hold-to-reveal reduces accidental peeking;
+          it is not a security boundary. Rooms are stored on this device only,
+          with no cross-device join or sync.
         </p>
         <button
           onClick={async () => {
