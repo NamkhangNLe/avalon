@@ -75,14 +75,13 @@ export function Lobby({
         <div className="flex flex-col items-center gap-3 text-center">
           <SectionTitle>Your table</SectionTitle>
           <p className="text-sm text-[#8f9cc0]">
-            Room code — share it so friends can open this room on their own
-            device.
+            Room code - use it to resume this room on the device that created it.
           </p>
           <p className="font-display text-4xl font-bold tracking-[0.35em] text-[#dbe4ff]">
             {game.roomCode}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <GhostButton onClick={copyLink}>{copied ? "✓ Link copied" : "Copy invite link"}</GhostButton>
+            <GhostButton onClick={copyLink}>{copied ? "✓ Link copied" : "Copy room link"}</GhostButton>
             <GhostButton onClick={onLeave}>Leave room</GhostButton>
           </div>
           <p className="max-w-md text-xs leading-relaxed text-[#5f6c91]">
@@ -225,4 +224,4 @@ export function Lobby({
       </div>
     </div>
   );
-}
+                              }
