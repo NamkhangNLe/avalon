@@ -7,12 +7,12 @@ to be.
 **v1 is pass-and-play:** one shared device moves around the table. Create a
 game, get a room code, add 5–10 players, and the app deals secret roles,
 runs proposals, votes, and quests, and ends with the Assassin's final gambit.
-Secrets stay secret behind hold-to-reveal cards and per-player pass screens.
+Hold-to-reveal cards and per-player pass screens reduce accidental peeking. They are not a security boundary: full game state, including roles, is stored locally and can be inspected in developer tools.
 
 ## Play
 
 ```bash
-npm install
+npm ci
 npm run dev        # http://localhost:3000
 ```
 
@@ -23,7 +23,7 @@ saved game on the same device.
 ## How a game flows
 
 1. **Lobby** — add 5–10 players, optionally enable Percival & Morgana (7+
-   players). Share the room code / invite link.
+   players). Room codes resume games only in the same browser; another device cannot join or sync.
 2. **Reveal** — each player holds to reveal their secret role (Merlin sees
    the evil; Percival sees two possible Merlins; evil knows each other;
    servants know no one).
@@ -73,6 +73,7 @@ The game logic is deliberately backend-agnostic:
 ```bash
 node scripts/selftest.mts   # game-engine logic: role tables, full-game sims
 npm run build              # production build (type-check + lint)
+npx eslint src             # scoped lint
 ```
 
 ## Roadmap
@@ -81,3 +82,9 @@ npm run build              # production build (type-check + lint)
   (implement `GameStore` on Supabase Realtime; no logic changes needed).
 - Mordred & Oberon as optional roles; custom role sets.
 - Game history / stats across tables.
+
+## Fonts and build packaging
+
+Five OFL-licensed WOFF2 fonts are bundled as base64 source with SHA-256 hashes in `scripts/fonts.json`. `npm ci`, `npm run build` and `npm run dev` recreate the exact bytes through `scripts/prepare-fonts.mjs`; no Google Fonts request is needed at build time. Generated binaries are ignored. See `src/app/fonts/README.md` and the adjacent license texts. This packaging avoids binary upload transport failures.
+
+Node 22.23.4 was used for verification, including native TypeScript execution of the engine self-test. See `docs/TESTPLAN.md` for tested paths and limits.
