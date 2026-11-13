@@ -145,7 +145,8 @@ export default function Home() {
                   setJoinError("");
                 }}
                 onKeyDown={(e) => e.key === "Enter" && joinGame()}
-                placeholder="Room code - e.g. KQMT"
+                placeholder="e.g. KQMT"
+                aria-label="Room code"
                 maxLength={4}
                 className="min-w-0 flex-1 rounded-md border border-[#34416a] bg-[#090d18] px-4 py-3 text-center font-display text-lg font-bold tracking-[0.3em] text-[#f6f8ff] placeholder:text-[#5f6c91] focus:border-[#9fb4e6] focus:outline-none"
               />
