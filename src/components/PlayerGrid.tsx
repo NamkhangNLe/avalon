@@ -27,42 +27,42 @@ export function PlayerCard({
   const inner = (
     <>
       <div className="relative">
-        <Avatar name={player.name} color={player.color} size={52} ring={isSelected ? "#e8c766" : undefined} />
+        <Avatar name={player.name} color={player.color} size={52} ring={isSelected ? "#dbe4ff" : undefined} />
         {isLeader && (
           <span
-            className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#c9a227] text-xs font-bold text-[#171204] shadow"
+            className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#9fb4e6] text-xs font-bold text-[#171204] shadow"
             title="Leader"
           >
             ♛
           </span>
         )}
       </div>
-      <span className="w-full truncate text-center text-sm font-semibold text-[#e9dfc8]">
+      <span className="w-full truncate text-center text-sm font-semibold text-[#e6ebf9]">
         {player.name}
       </span>
       {badge ? (
-        <span className="rounded-full bg-[#c9a227]/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#e8c766] uppercase">
+        <span className="rounded-full bg-[#9fb4e6]/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#dbe4ff] uppercase">
           {badge}
         </span>
       ) : showRole && player.role ? (
-        <span className="rounded-full bg-[#2c2618] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#a99e83] uppercase">
+        <span className="rounded-full bg-[#242f4d] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#8f9cc0] uppercase">
           {roleLabel(player.role)}
         </span>
       ) : isOnTeam ? (
-        <span className="rounded-full bg-[#c9a227]/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#e8c766] uppercase">
+        <span className="rounded-full bg-[#9fb4e6]/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#dbe4ff] uppercase">
           On quest
         </span>
       ) : (
-        <span className="text-[10px] text-[#6f6650]"> </span>
+        <span className="text-[10px] text-[#5f6c91]"> </span>
       )}
     </>
   );
 
   const cls = `flex flex-col items-center gap-1.5 rounded-2xl border p-3 transition-all ${
     isSelected
-      ? "border-[#e8c766] bg-[#c9a227]/10 shadow-[0_0_20px_rgba(201,162,39,0.25)]"
-      : "border-[#2c2618] bg-[#171410]/80"
-  } ${onClick ? "cursor-pointer hover:border-[#c9a227]/60 active:scale-[0.98]" : ""} ${
+      ? "border-[#dbe4ff] bg-[#9fb4e6]/10 shadow-[0_0_20px_rgba(159,180,230,0.25)]"
+      : "border-[#242f4d] bg-[#111829]/80"
+  } ${onClick ? "cursor-pointer hover:border-[#9fb4e6]/60 active:scale-[0.98]" : ""} ${
     disabled ? "opacity-50" : ""
   }`;
 

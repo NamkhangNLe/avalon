@@ -8,6 +8,20 @@ import { Lobby } from "@/components/Lobby";
 import { RoleReveal } from "@/components/RoleReveal";
 import { Divider, GhostButton, GoldButton, Panel, SectionTitle } from "@/components/ui";
 
+
+function Crest() {
+  return (
+    <svg viewBox="0 0 100 120" className="mx-auto h-28 w-auto" role="img" aria-label="Heraldic shield with a sword">
+      <path d="M50 4 L92 18 V58 C92 88 70 108 50 116 C30 108 8 88 8 58 V18 Z" fill="#111829" stroke="#9fb4e6" strokeWidth="2" />
+      <path d="M50 4 L92 18 V58 C92 88 70 108 50 116 Z" fill="#8f2420" opacity="0.85" />
+      <path d="M50 4 L8 18 V58 C8 88 30 108 50 116 Z" fill="#13213f" />
+      <path d="M50 22 V92 M36 40 H64" stroke="#e6ebf9" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="50" cy="96" r="3.5" fill="#e6ebf9" />
+      <path d="M50 4 L92 18 V58 C92 88 70 108 50 116 C30 108 8 88 8 58 V18 Z" fill="none" stroke="#dbe4ff" strokeWidth="1" opacity="0.5" transform="translate(0 0) scale(1)" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [game, setGame] = useState<GameState | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -80,7 +94,7 @@ export default function Home() {
   if (!loaded) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="font-display text-sm tracking-[0.3em] text-[#c9a227] uppercase">
+        <p className="font-display text-sm tracking-[0.3em] text-[#9fb4e6] uppercase">
           Lighting the torches…
         </p>
       </div>
@@ -93,13 +107,14 @@ export default function Home() {
     return (
       <div className="mx-auto flex min-h-screen w-full max-w-xl flex-col items-center justify-center gap-6 px-4 py-16 text-center">
         <header>
-          <p className="font-display text-xs font-bold tracking-[0.4em] text-[#c9a227] uppercase">
+          <Crest />
+          <p className="font-display mt-5 text-sm font-bold tracking-[0.4em] text-[#9fb4e6] uppercase">
             The Resistance
           </p>
-          <h1 className="font-display mt-2 text-7xl font-black tracking-[0.08em] text-[#f5efe0] sm:text-8xl">
+          <h1 className="font-display mt-2 text-7xl font-bold tracking-[0.12em] text-[#f6f8ff] sm:text-8xl">
             AVALON
           </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#a99e83]">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-[#8f9cc0]">
             A game of hidden loyalty and quiet betrayal, played on one shared
             device. Five quests stand between Camelot and the dark.
           </p>
@@ -130,15 +145,16 @@ export default function Home() {
                   setJoinError("");
                 }}
                 onKeyDown={(e) => e.key === "Enter" && joinGame()}
-                placeholder="Room code — e.g. KQMT"
+                placeholder="e.g. KQMT"
+                aria-label="Room code"
                 maxLength={4}
-                className="min-w-0 flex-1 rounded-full border border-[#3a332a] bg-[#0b0a08] px-4 py-3 text-center font-display text-lg font-bold tracking-[0.3em] text-[#f5efe0] placeholder:text-[#6f6650] focus:border-[#c9a227] focus:outline-none"
+                className="min-w-0 flex-1 rounded-md border border-[#34416a] bg-[#090d18] px-4 py-3 text-center font-display text-lg font-bold tracking-[0.3em] text-[#f6f8ff] placeholder:text-[#5f6c91] focus:border-[#9fb4e6] focus:outline-none"
               />
               <GoldButton onClick={joinGame} disabled={joinCode.length !== 4}>
                 Join
               </GoldButton>
             </div>
-            {joinError && <p className="mt-2 text-xs leading-relaxed text-[#ff8a80]">{joinError}</p>}
+            {joinError && <p className="mt-2 text-xs leading-relaxed text-[#ff9d94]">{joinError}</p>}
           </Panel>
         </div>
 
@@ -149,16 +165,16 @@ export default function Home() {
             { n: "3", label: "to win" },
           ].map((s) => (
             <Panel key={s.label} className="px-2 py-3">
-              <p className="font-display text-2xl font-black text-[#e8c766]">{s.n}</p>
-              <p className="text-[11px] tracking-[0.18em] text-[#a99e83] uppercase">{s.label}</p>
+              <p className="font-display text-2xl font-bold text-[#dbe4ff]">{s.n}</p>
+              <p className="text-[11px] tracking-[0.18em] text-[#8f9cc0] uppercase">{s.label}</p>
             </Panel>
           ))}
         </div>
 
-        <p className="max-w-md text-xs leading-relaxed text-[#6f6650]">
-          Pass-and-play on one device — the phone moves around the table, and
-          secrets stay secret behind hold-to-reveal. A realtime multiplayer
-          backend can plug into the same game state later.
+        <p className="max-w-md text-xs leading-relaxed text-[#5f6c91]">
+          Pass-and-play on one device. Hold-to-reveal reduces accidental peeking;
+          it is not a security boundary. Rooms are stored on this device only,
+          with no cross-device join or sync.
         </p>
         <button
           onClick={async () => {
@@ -170,7 +186,7 @@ export default function Home() {
               /* clipboard unavailable */
             }
           }}
-          className="text-xs font-semibold text-[#c9a227] hover:text-[#e8c766]"
+          className="text-xs font-semibold text-[#9fb4e6] hover:text-[#dbe4ff]"
         >
           {copied ? "✓ Link copied" : "Copy a link to this page"}
         </button>

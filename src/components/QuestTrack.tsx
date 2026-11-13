@@ -17,17 +17,17 @@ export function QuestTrack({ state }: { state: GameState }) {
               <div
                 className={`flex h-11 w-11 items-center justify-center rounded-full border-2 font-display text-base font-bold transition-all sm:h-12 sm:w-12 ${
                   result?.success
-                    ? "border-[#c9a227] bg-[#c9a227]/25 text-[#e8c766] shadow-[0_0_18px_rgba(201,162,39,0.35)]"
+                    ? "border-[#9fb4e6] bg-[#9fb4e6]/25 text-[#dbe4ff] shadow-[0_0_18px_rgba(159,180,230,0.35)]"
                     : result && !result.success
-                      ? "border-[#b3261e] bg-[#b3261e]/25 text-[#ff8a80] shadow-[0_0_18px_rgba(179,38,30,0.35)]"
+                      ? "border-[#c8423a] bg-[#c8423a]/25 text-[#ff9d94] shadow-[0_0_18px_rgba(179,38,30,0.35)]"
                       : isCurrent
-                        ? "animate-pulse border-[#e8c766] bg-transparent text-[#e8c766]"
-                        : "border-[#3a332a] bg-[#171410] text-[#6f6650]"
+                        ? "animate-pulse border-[#dbe4ff] bg-transparent text-[#dbe4ff]"
+                        : "border-[#34416a] bg-[#111829] text-[#5f6c91]"
                 }`}
               >
                 {result?.success ? "✓" : result && !result.success ? "✕" : i + 1}
               </div>
-              <span className="text-[10px] font-semibold tracking-wider text-[#a99e83]">
+              <span className="text-[10px] font-semibold tracking-wider text-[#8f9cc0]">
                 {size} knight{size > 1 ? "s" : ""}
                 {needsTwo ? " · 2✕" : ""}
               </span>
@@ -38,18 +38,18 @@ export function QuestTrack({ state }: { state: GameState }) {
 
       {/* vote track */}
       <div className="mt-4 flex items-center justify-center gap-2">
-        <span className="text-[10px] font-semibold tracking-[0.18em] text-[#6f6650] uppercase">
+        <span className="text-[10px] font-semibold tracking-[0.18em] text-[#5f6c91] uppercase">
           Rejected proposals
         </span>
         {Array.from({ length: 5 }).map((_, i) => (
           <span
             key={i}
             className={`h-2.5 w-2.5 rounded-full ${
-              i < state.voteTrack ? "bg-[#b3261e]" : "bg-[#2c2618]"
+              i < state.voteTrack ? "bg-[#c8423a]" : "bg-[#242f4d]"
             }`}
           />
         ))}
-        <span className="text-[10px] text-[#6f6650]">
+        <span className="text-[10px] text-[#5f6c91]">
           {state.voteTrack === 4
             ? "— one more rejection and Evil wins"
             : state.voteTrack > 0

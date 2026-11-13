@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Recreated from SHA-256 checked source by npm prepare/prebuild/predev
+/src/app/fonts/*.woff2

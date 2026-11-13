@@ -1,17 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const cinzel = Cinzel({
+const cinzel = localFont({
   variable: "--font-cinzel",
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
+  display: "swap",
+  src: [
+    { path: "./fonts/cormorant-garamond-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/cormorant-garamond-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
 });
 
-const inter = Inter({
+const inter = localFont({
   variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  src: [
+    { path: "./fonts/alegreya-sans-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/alegreya-sans-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/alegreya-sans-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0a08",
+  themeColor: "#090d18",
 };
 
 export default function RootLayout({
