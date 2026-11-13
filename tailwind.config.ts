@@ -11,6 +11,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // Compatibility alias: the round-table theme uses periwinkle, not gold.
         gold: {
           DEFAULT: "#9fb4e6",
           bright: "#dbe4ff",
@@ -21,6 +22,7 @@ export default {
         blood: "#c8423a",
       },
       fontFamily: {
+        // Legacy CSS variable name, now supplied by bundled Cormorant.
         display: ["var(--font-cinzel)", "Georgia", "serif"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
