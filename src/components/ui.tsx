@@ -314,4 +314,4 @@ export function HoldToReveal({
       </div>
     </div>
   );
-  }
+}
