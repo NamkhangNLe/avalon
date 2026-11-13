@@ -17,7 +17,7 @@ export function QuestTrack({ state }: { state: GameState }) {
               <div
                 className={`flex h-11 w-11 items-center justify-center rounded-full border-2 font-display text-base font-bold transition-all sm:h-12 sm:w-12 ${
                   result?.success
-                    ? "border-[#9fb4e6] bg-[#9fb4e6]/25 text-[#dbe4ff] shadow-[0_0_18px_rgba(201,162,39,0.35)]"
+                    ? "border-[#9fb4e6] bg-[#9fb4e6]/25 text-[#dbe4ff] shadow-[0_0_18px_rgba(159,180,230,0.35)]"
                     : result && !result.success
                       ? "border-[#c8423a] bg-[#c8423a]/25 text-[#ff9d94] shadow-[0_0_18px_rgba(179,38,30,0.35)]"
                       : isCurrent
